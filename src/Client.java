@@ -1,31 +1,37 @@
-import java.net.*;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+
+
 import java.io.*;
+import java.net.*;
 import java.util.*;
+
+import javax.swing.JOptionPane;
 
 
 public class Client {
 
     // for I/O
-    private ObjectInputStream sInput;		// to read from the socket
-    private ObjectOutputStream sOutput;		// to write on the socket
+     ObjectInputStream sInput;		// to read from the socket
+     ObjectOutputStream sOutput;		// to write on the socket
     private Socket socket;
 
     // the Server, the port and the username
     private String server, username;
     private int port;
-    
-    public Client(){
-    	
-    }
 
-    public Client(String server, int port, String username) {
+    Client(String server, int port, String username) {
         this.server = server;
         this.port = port;
         this.username = username;
     }
 
     
-    private boolean start() {
+     boolean start() {
         // try to connect to the Server
         try {
             socket = new Socket(server, port);
@@ -71,8 +77,9 @@ public class Client {
     /*
      * To send a message to the Server
      */
-    private void sendMessage(Message msg) {
+    void sendMessage(Message msg) {
         try {
+	    //System.out.println("send mes");
             sOutput.writeObject(msg);
         }
         catch(IOException e) {
@@ -84,7 +91,7 @@ public class Client {
      * When something goes wrong
      * Close the Input/Output streams and disconnect not much to do in the catch clause
      */
-    private void disconnect() {
+    void disconnect() {
         try {
             if(sInput != null) sInput.close();
         }
@@ -154,8 +161,12 @@ public class Client {
             while(true) {
                 try {
                     String msg = (String) sInput.readObject();
+                    if(msg.equals("WrongUserOrPassword")){
+                    	System.out.println("hey i'm here");
+                    	JOptionPane.showMessageDialog(null, "wrong username or password");
+                    }
                     // if console mode print the message and add back the prompt
-                    System.out.println(msg);
+                   // System.out.println(msg);
                 }
                 catch(IOException e) {
                     System.out.println("Server has close the connection: " + e);

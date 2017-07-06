@@ -1,25 +1,24 @@
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 public class Frame extends JFrame implements ActionListener{
 	Dimension d;
-	JButton search , signin;
+	JButton search , signin , signup;
 	JTextField question;
 	Panel p;
-	Signin s;
-	Client client;
-	public Frame(Client client){
-		
-		this.client = client;
-		this.p = p;
+	Signin si;
+	Signup sp;
+	Client c;
+	public Frame(){
+		c = new Client ("127.0.0.1",8000,"signup");
+		c.start();
+this.p = p;
 		d=Toolkit.getDefaultToolkit().getScreenSize();
 		setSize((int)d.getWidth()/2,(int)d.getHeight()/2+100);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -34,15 +33,21 @@ public class Frame extends JFrame implements ActionListener{
 	 	signin.setSize(80, 30);
 	 	signin.setLocation(580, 10);
 	 	
+	 	signup = new JButton("signup");
+	 	signup.setSize(80, 30);
+	 	signup.setLocation(480, 10);
+	 	
 	 	question = new JTextField();
 	 	question.setSize(550, 50);
 	 	question.setLocation(10, 80);
 	 	
 	 	getContentPane().add(search);
 	 	getContentPane().add(signin);
+	 	getContentPane().add(signup);
 	 	getContentPane().add(question);
 	 	search.addActionListener(this);
 	 	signin.addActionListener(this);
+	 	signup.addActionListener(this);
 	 	p = new Panel(d,this);
 	 	this.getContentPane().add(p);
 	 	setVisible(true);
@@ -55,7 +60,11 @@ public class Frame extends JFrame implements ActionListener{
 		}
 		
 		if(arg0.getSource()==signin){
-			s = new Signin();
+			si = new Signin(c);
+		}
+		
+		if(arg0.getSource()==signup){
+			sp = new Signup(c);
 		}
 	}
 
