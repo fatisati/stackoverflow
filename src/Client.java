@@ -160,11 +160,21 @@ public class Client {
         public void run() {
             while(true) {
                 try {
-                    String msg = (String) sInput.readObject();
-                    if(msg.equals("WrongUserOrPassword")){
-                    	System.out.println("hey i'm here");
-                    	JOptionPane.showMessageDialog(null, "wrong username or password");
-                    }
+                	Object obj = sInput.readObject();
+                	
+                	if(obj instanceof String){
+                		String msg = (String) sInput.readObject();
+                        if(msg.equals("WrongUserOrPassword")){
+                        	//System.out.println("hey i'm here");
+                        	JOptionPane.showMessageDialog(null, "wrong username or password");
+                        }
+                	}
+                	
+                	if(obj instanceof Userz){
+                		Userz user = (Userz)obj;
+                		System.out.println("welcom " + user.interest[0]);
+                	}
+                    
                     // if console mode print the message and add back the prompt
                    // System.out.println(msg);
                 }

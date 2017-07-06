@@ -75,13 +75,14 @@ public class Signin extends JPanel implements ActionListener {
 		JOptionPane.showMessageDialog(null, "Error:you should enter your password");
 	    }
 	    Userz u = new Userz("", username.getText(), "", password.getText(), null);
+	    
 			c.sendMessage(new Message(Message.LOGIN, u));
-			if (c.sInput.equals("WrongUserOrPassword")) {
-				JOptionPane.showMessageDialog(null, "wrong username or password");
-			} else {
-				mp = new MainPage(c, u);
-
-			}
+//			if (c.sInput.equals("WrongUserOrPassword")) {
+//				JOptionPane.showMessageDialog(null, "wrong username or password");
+//			} else {
+//				mp = new MainPage(c, u);
+//
+//			}
 	}
 
     }

@@ -121,10 +121,18 @@ public class Server {
 						if (intrest != null)
 							intrestList[i] = (int) intrest.charAt(i) - 48;
 					}
-					// u.interest = intrestList;
+					u.interest = intrestList;
+					//Message msg = new Message(Message.LOGIN, u);
+					try {
+						sOutput.writeObject(u);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					return 0;
 				} else {
 					return 2;
+					
 				}
 			} else {
 				return 2;
@@ -143,13 +151,16 @@ public class Server {
 		// System.out.println(myDoc.toJson());
 		if (type == 3) {
 			int m = 0;
-			String intrest = new String();
+			//String intrest = new String();
 
-			for (int i = 4; i >= 0; i--) {
-				intrest.concat(Integer.toString(u.interest[i]));
-			}
+//			for (int i = 4; i >= 0; i--) {
+//				intrest.concat(Integer.toString(u.interest[i]));
+//			}
+			String arr[] = new String[3];
+			arr[0] = "fat";
+			arr[1] = "sat";
 			Document doc = new Document("name", u.user).append("username", u.username).append("email", u.email)
-					.append("password", u.pass).append("intrest", intrest);
+					.append("password", u.pass).append("intrest", arr);
 			// collection.deleteMany("name",123);
 
 			MongoCursor<Document> cursor = collection.find().iterator();
