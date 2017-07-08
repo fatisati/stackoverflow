@@ -10,7 +10,7 @@ import java.io.*;
 
 public class Message implements Serializable {
 
-    static final int SEARCH = 0, LOGIN = 1, LOGOUT = 2, REGISTER = 3;
+    static final int SEARCH = 0, LOGIN = 1, LOGOUT = 2, REGISTER = 3, ADD = 4, GETKEYWORDS = 5;
     private int type;
     private String message;
     Object messageObject ;

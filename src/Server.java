@@ -8,6 +8,8 @@ import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.sun.org.apache.xpath.internal.compiler.Keywords;
+
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.excludeId;
@@ -103,11 +105,21 @@ public class Server {
 	private synchronized int answer(int type, Object message, ObjectOutputStream sOutput) {
 		// String[] words = message.split("\\s");//splits the string based on
 		// whitespace
-		MongoCollection<Document> collection = database.getCollection("question");
-		Userz u = (Userz) message;
-		if (type == 1) {
-
+		//MongoCollection<Document> collection = database.getCollection("question");
+		Userz u= null;
+		
+		if(message instanceof Userz){
+			 u = (Userz) message;
+		}
+		
+		if (type == 1) { //login
+			//Userz u = (Userz) message;
+			MongoCollection<Document> collection = database.getCollection("Users");
+			u = (Userz) message;
 			Document doc = new Document("username", u.username).append("password", u.pass);
+			
+			
+			//System.out.println(doc.toJson()+"heh");
 			Document doc1 = collection.find(eq("username", u.username)).first();
 
 			if (doc1 != null) {
@@ -149,7 +161,10 @@ public class Server {
 		//
 		// Document myDoc = collection.find(Query).first();
 		// System.out.println(myDoc.toJson());
-		if (type == 3) {
+		if (type == 3) { //signup
+			//Userz u = (Userz) message;
+			MongoCollection<Document> collection = database.getCollection("Users");
+			u = (Userz) message;
 			int m = 0;
 			//String intrest = new String();
 
@@ -157,10 +172,8 @@ public class Server {
 //				intrest.concat(Integer.toString(u.interest[i]));
 //			}
 			String arr[] = new String[3];
-			arr[0] = "fat";
-			arr[1] = "sat";
-			Document doc = new Document("name", u.user).append("username", u.username).append("email", u.email)
-					.append("password", u.pass).append("intrest", arr);
+			Document doc = new Document("name", u.name).append("username", u.username).append("email", u.email)
+					.append("password", u.pass).append("intrest", "java");
 			// collection.deleteMany("name",123);
 
 			MongoCursor<Document> cursor = collection.find().iterator();
@@ -180,51 +193,42 @@ public class Server {
 				return 1;
 			}
 		}
-		// Document doc1 = collection.find(eq("username",u.username )).first();
-		// System.out.println(doc.toJson());
-		// System.out.println(collection.count());
-		// MongoCursor<Document> cursor = collection.find().iterator();
-		// try {
-		// while (cursor.hasNext()) {
-		// System.out.println(cursor.next().toJson());
-		// }
-		// } finally {
-		// cursor.close();
-		// }
-		// delete furmula
-		// MongoCursor<Document> cursor1 = collection.find().iterator();
-		// try {
-		// while (cursor1.hasNext()) {
-		// collection.deleteOne(cursor.next());
-		// }
-		// } finally {
-		// cursor1.close();
-		// }
-		// BasicDBObject Query = new BasicDBObject();
-		// List<BasicDBObject> obj = new ArrayList<BasicDBObject😠);
-		// obj.add(new BasicDBObject("username",u.username));
-		// obj.add(new BasicDBObject("password",u.pass));
-		// System.out.println(Query.toString()+"query is rinting");
-		// Document myDoc = collection.find(Query).first();
-		// System.out.println(myDoc.toJson()+"your search answer is printed");
+		
+		if(type == Message.ADD){
+			MongoCollection<Document> collection = database.getCollection("Question");
 
-		// collection.insertOne(new Document("name ", message));
-		// System.out.println(
-		// collection.find().projection(fields(include("name"),excludeId()))
-		// );
-		// Vector<String> keywords = new Vector<😠);
-		// Document allKeywords = collection.find(new Document("allKeywords",
-		// new Document("$exists", true))).first();
-		// ArrayList<String> q = (ArrayList<String>)
-		// allKeywords.get("allKeywords");
-		// for(String w:words){
-		// if (q.contains(w)){
-		// keywords.add(w);
-		// System.out.println(w);
-		// }
-		// }
-		// System.out.println(message);
-		// database.insert(new Document("name ", message));
+			Question q = (Question)message;
+			Document doc = new Document("content", q.content);
+			
+			doc.append("keywords", q.keywords).append("writer", q.writer.username);
+			//System.out.println("hi");
+			String msg;
+			if(collection.find(eq("content", q.content)).first()==null){
+				msg = "your questoin added successfully";
+				try {
+					sOutput.writeObject(msg);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				collection.insertOne(doc);
+				//System.out.println("hemm");
+				
+			}
+			else{
+				msg = "tekrari";
+				try {
+					sOutput.writeObject(msg);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			
+			
+		}
+		
 		return 0;
 	}
 
@@ -339,7 +343,13 @@ public class Server {
 					// ct.date);
 					// }
 					break;
+					
+				case Message.ADD:
+					answer(Message.ADD, message, sOutput);
 				}
+				
+				
+					
 			}
 			// remove myself from the arrayList containing the list of the
 			// connected Clients

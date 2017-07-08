@@ -1,3 +1,5 @@
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class RegisterdUser extends Client{
 	
@@ -5,6 +7,8 @@ public class RegisterdUser extends Client{
 	String username;
 	String email;
 	String password;
+	JPanel panel;
+	JTextField jfield;
 	
 	public RegisterdUser(String name, String username, String email, String password,
 			String server, int port) {
@@ -14,5 +18,15 @@ public class RegisterdUser extends Client{
 		this.username = username;
 		this.email = email;
 		this.password = password;
+		panel = new JPanel();
+		panel.setSize(500, 500);
+		
+		jfield = new JTextField();
+		
+		panel.setVisible(true);
 	}
+	
+	
+	
+	
 }

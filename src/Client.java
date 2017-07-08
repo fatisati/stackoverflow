@@ -10,6 +10,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 
@@ -23,11 +24,16 @@ public class Client {
     // the Server, the port and the username
     private String server, username;
     private int port;
+    
+    boolean islogin;
+    JLabel label;
 
     Client(String server, int port, String username) {
         this.server = server;
         this.port = port;
         this.username = username;
+        islogin = false;
+        //this.label = label;
     }
 
     
@@ -57,7 +63,7 @@ public class Client {
         }
 
         // creates the Thread to listen from the Server
-        new ListenFromServer().start();
+        new ListenFromServer(this).start();
         // Send our username to the Server this is the only message that we
         // will send as a String. All other messages will be Message objects
         try
@@ -109,46 +115,46 @@ public class Client {
 
     public static void main(String[] args) {
         // default values
-        int portNumber = 8000;
-        String serverAddress = "DESKTOP-59E54A2";
-        String userName = "Anonymous1";
-
-        // create the Client object
-        Client client = new Client(serverAddress, portNumber, userName);
-        // test if we can start the connection to the Server
-        // if it failed nothing we can do
-        if(!client.start())
-            return;
-
-        // wait for messages from user
-        Scanner scan = new Scanner(System.in);
-        // loop forever for message from the user
-        while(true) {
-            // read message from user
-            String msg = scan.nextLine();
-
-            // message SEARCH
-            if(msg.equalsIgnoreCase("SEARCH")) {
-                System.out.println("Enter the your query:");
-                String content = scan.nextLine();
-                client.sendMessage(new Message(Message.SEARCH, content));
-            }
-            // message LOGIN
-            else if(msg.equalsIgnoreCase("LOGIN")) {
-                client.sendMessage(new Message(Message.LOGIN, ""));
-            }
-            // message LOGOUT
-            else if(msg.equalsIgnoreCase("LOGOUT")) {
-                client.sendMessage(new Message(Message.LOGOUT, ""));
-                break;
-            }
-            // message REGISTER
-            else if(msg.equalsIgnoreCase("REGISTER")) {
-                client.sendMessage(new Message(Message.REGISTER, ""));
-            }
-        }
-        // done disconnect
-        client.disconnect();
+//        int portNumber = 8000;
+//        String serverAddress = "DESKTOP-59E54A2";
+//        String userName = "Anonymous1";
+//
+//        // create the Client object
+//        Client client = new Client(serverAddress, portNumber, userName);
+//        // test if we can start the connection to the Server
+//        // if it failed nothing we can do
+//        if(!client.start())
+//            return;
+//
+//        // wait for messages from user
+//        Scanner scan = new Scanner(System.in);
+//        // loop forever for message from the user
+//        while(true) {
+//            // read message from user
+//            String msg = scan.nextLine();
+//
+//            // message SEARCH
+//            if(msg.equalsIgnoreCase("SEARCH")) {
+//                System.out.println("Enter the your query:");
+//                String content = scan.nextLine();
+//                client.sendMessage(new Message(Message.SEARCH, content));
+//            }
+//            // message LOGIN
+//            else if(msg.equalsIgnoreCase("LOGIN")) {
+//                client.sendMessage(new Message(Message.LOGIN, ""));
+//            }
+//            // message LOGOUT
+//            else if(msg.equalsIgnoreCase("LOGOUT")) {
+//                client.sendMessage(new Message(Message.LOGOUT, ""));
+//                break;
+//            }
+//            // message REGISTER
+//            else if(msg.equalsIgnoreCase("REGISTER")) {
+//                client.sendMessage(new Message(Message.REGISTER, ""));
+//            }
+//        }
+//        // done disconnect
+//        client.disconnect();
     }
 
     /*
@@ -156,23 +162,36 @@ public class Client {
      * if we have a GUI or simply System.out.println() it in console mode
      */
     class ListenFromServer extends Thread {
-
+    	Client client;
+    	int i=0;
+    	public ListenFromServer(Client client){
+    		this.client = client;
+    	}
         public void run() {
             while(true) {
+            	i++;
+            	System.out.println(i);
                 try {
+                	
                 	Object obj = sInput.readObject();
                 	
                 	if(obj instanceof String){
                 		String msg = (String) sInput.readObject();
+                		//System.out.println(msg);
                         if(msg.equals("WrongUserOrPassword")){
                         	//System.out.println("hey i'm here");
                         	JOptionPane.showMessageDialog(null, "wrong username or password");
+                        }
+                        else{
+                        	JOptionPane.showMessageDialog(null, msg);
                         }
                 	}
                 	
                 	if(obj instanceof Userz){
                 		Userz user = (Userz)obj;
-                		System.out.println("welcom " + user.interest[0]);
+                		islogin = true;
+                		//System.out.println("welcom " + user.interest[0]);
+                		new MainPage(client, user);
                 	}
                     
                     // if console mode print the message and add back the prompt
@@ -184,6 +203,7 @@ public class Client {
                 }
                 // can't happen with a String object but need the catch anyhow
                 catch(ClassNotFoundException ignored) {
+                	System.out.println("class");
                 }
             }
         }
