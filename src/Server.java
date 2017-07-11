@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -8,6 +9,13 @@ import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.Sorts;
+import com.mongodb.gridfs.GridFS;
+import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSInputFile;
 import com.sun.org.apache.xpath.internal.compiler.Keywords;
 
 import static com.mongodb.client.model.Filters.and;
@@ -19,6 +27,9 @@ import java.io.*;
 import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import javax.swing.JOptionPane;
+
 import org.bson.Document;
 
 public class Server {
@@ -105,36 +116,39 @@ public class Server {
 	private synchronized int answer(int type, Object message, ObjectOutputStream sOutput) {
 		// String[] words = message.split("\\s");//splits the string based on
 		// whitespace
-		//MongoCollection<Document> collection = database.getCollection("question");
-		Userz u= null;
-		
-		if(message instanceof Userz){
-			 u = (Userz) message;
+		// MongoCollection<Document> collection =
+		// database.getCollection("question");
+		Userz u = null;
+
+		if (message instanceof Userz) {
+			u = (Userz) message;
 		}
-		
-		if (type == 1) { //login
-			//Userz u = (Userz) message;
+
+		if (type == 1) { // login
+			// Userz u = (Userz) message;
 			MongoCollection<Document> collection = database.getCollection("Users");
 			u = (Userz) message;
 			Document doc = new Document("username", u.username).append("password", u.pass);
-			
-			
-			//System.out.println(doc.toJson()+"heh");
+
+			// System.out.println(doc.toJson()+"heh");
 			Document doc1 = collection.find(eq("username", u.username)).first();
 
 			if (doc1 != null) {
+				//saveImg("C:\\Users\\Fateme\\workspace\\StackOverflow\\ghool1.png", "ghool");
+				//showImg("ghool");
 				Document doc2 = collection.find(and(eq("username", u.username), eq("password", u.pass))).first();
 				if (doc2 != null) {
-					String intrest = collection.find(and(eq("username", u.username), eq("password", u.pass)))
-							.projection(fields(include("intrest"), excludeId())).first().toJson();
-					System.out.println(intrest);
-					int[] intrestList = new int[5];
-					for (int i = 0; i < 5; i++) {
-						if (intrest != null)
-							intrestList[i] = (int) intrest.charAt(i) - 48;
-					}
-					u.interest = intrestList;
-					//Message msg = new Message(Message.LOGIN, u);
+//					String intrest = collection.find(and(eq("username", u.username), eq("password", u.pass)))
+//							.projection(fields(include("intrest"), excludeId())).first().toJson();
+//					System.out.println(intrest);
+//					int[] intrestList = new int[5];
+//					for (int i = 0; i < 5; i++) {
+//						if (intrest != null)
+//							intrestList[i] = (int) intrest.charAt(i) - 48;
+//					}
+					u.interest = (ArrayList<String>) doc2.get("interest");
+					System.out.println(u.username+" "+u.interest.size());
+					// Message msg = new Message(Message.LOGIN, u);
 					try {
 						sOutput.writeObject(u);
 					} catch (IOException e) {
@@ -144,36 +158,26 @@ public class Server {
 					return 0;
 				} else {
 					return 2;
-					
+
 				}
 			} else {
 				return 2;
 			}
 		}
 
-		//
-		// BasicDBObject Query = new BasicDBObject();
-		// List<BasicDBObject> obj = new ArrayList<BasicDBObject😠);
-		// obj.add(new BasicDBObject("username", u.username));
-		// obj.add(new BasicDBObject("password", u.pass));
-		//
-		// System.out.println(Query.toString());
-		//
-		// Document myDoc = collection.find(Query).first();
-		// System.out.println(myDoc.toJson());
-		if (type == 3) { //signup
-			//Userz u = (Userz) message;
+		if (type == 3) { // signup
+			// Userz u = (Userz) message;
 			MongoCollection<Document> collection = database.getCollection("Users");
 			u = (Userz) message;
 			int m = 0;
-			//String intrest = new String();
+			// String intrest = new String();
 
-//			for (int i = 4; i >= 0; i--) {
-//				intrest.concat(Integer.toString(u.interest[i]));
-//			}
+			// for (int i = 4; i >= 0; i--) {
+			// intrest.concat(Integer.toString(u.interest[i]));
+			// }
 			String arr[] = new String[3];
 			Document doc = new Document("name", u.name).append("username", u.username).append("email", u.email)
-					.append("password", u.pass).append("intrest", "java");
+					.append("password", u.pass).append("interest", u.interest);
 			// collection.deleteMany("name",123);
 
 			MongoCursor<Document> cursor = collection.find().iterator();
@@ -188,22 +192,41 @@ public class Server {
 			Document doc1 = collection.find(eq("username", u.username)).first();
 			if (doc1 == null) {
 				collection.insertOne(doc);
+				System.out.println("signed up");
+	        	try {
+					sOutput.writeObject("you have signed up successfully");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					System.out.println("not sent");
+				}
+
 				return 0;
 			} else {
 				return 1;
 			}
-		}
-		
-		if(type == Message.ADD){
-			MongoCollection<Document> collection = database.getCollection("Question");
-
-			Question q = (Question)message;
-			Document doc = new Document("content", q.content);
 			
-			doc.append("keywords", q.keywords).append("writer", q.writer.username);
-			//System.out.println("hi");
+
+		}
+
+		if (type == Message.ADD) {
+			MongoCollection<Document> collection = database.getCollection("Question");
+			MongoCollection<Document> keywordsCollection = database.getCollection("Keywords");
+
+			Question q = (Question) message;
+			Document doc = new Document("content", q.content);
+
+			doc.append("keywords", q.keywords).append("writer", q.writer.username).append("answers", q.answers);
+
+			for (String keyword : q.keywords) {
+
+				if (keywordsCollection.find(new Document("keyword", keyword)).first() == null) {
+					keywordsCollection.insertOne(new Document("keyword", keyword));
+					System.out.println(keyword);
+				}
+			}
+			// System.out.println("hi");
 			String msg;
-			if(collection.find(eq("content", q.content)).first()==null){
+			if (collection.find(eq("content", q.content)).first() == null) {
 				msg = "your questoin added successfully";
 				try {
 					sOutput.writeObject(msg);
@@ -212,10 +235,9 @@ public class Server {
 					e.printStackTrace();
 				}
 				collection.insertOne(doc);
-				//System.out.println("hemm");
-				
-			}
-			else{
+				// System.out.println("hemm");
+
+			} else {
 				msg = "tekrari";
 				try {
 					sOutput.writeObject(msg);
@@ -224,12 +246,139 @@ public class Server {
 					e.printStackTrace();
 				}
 			}
-			
-			
-			
+
+		}
+
+		if (type == Message.SEARCH) {
+
+			String content = (String) message;
+
+			StringBuilder keywords = new StringBuilder();
+			MongoCollection<Document> collection = database.getCollection("Question");
+			MongoCollection<Document> kewordsCollection = database.getCollection("Keywords");
+
+			String arr[] = content.split(" ");
+
+			for (String key : arr) {
+				if (kewordsCollection.find(eq("keyword", key)).first() != null) {
+					keywords.append(key + " ");
+				}
+			}
+
+			collection.createIndex(Indexes.text("keywords"));
+			Iterator<Document> itr = collection.find(Filters.text(keywords.toString())).projection(Projections.metaTextScore("score"))
+                    .sort(Sorts.metaTextScore("score")).iterator();
+			ArrayList<Question> questions = new ArrayList<>();
+			while (itr.hasNext()) {
+
+				Document d = itr.next();
+				Question q = new Question(d.getString("content"), (ArrayList<String>) d.get("keywords"));
+				q.answers = (ArrayList<String>) d.get("answers");
+				if(q.answers == null){
+					q.answers = new ArrayList<>();
+				}
+				questions.add(q);
+			}
+
+			try {
+				sOutput.writeObject(questions);
+				// System.out.println(questions.get(0).content+" hemm");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// System.out.println("hum?");
+
+		}
+
+		if (type == Message.ANSWER) {
+			System.out.println("answers");
+			Question q = (Question) message;
+			MongoCollection<Document> collection = database.getCollection("Question");
+			if(q == null){
+				System.out.println("q");
+			}
+			System.out.println("here "+q.answers.size());
+			collection.updateOne(and(eq("content", q.content), eq("keywords", q.keywords)),
+					new Document("$set", new Document("answers", q.answers)));
+			try {
+				sOutput.writeObject("your answer added successfully");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
+		if (type == Message.DELETE) {
+
+			Question q = (Question) message;
+			MongoCollection<Document> collection = database.getCollection("Question");
+			collection.deleteOne(and(eq("content", q.content), eq("keywords", q.keywords)));
+			try {
+				sOutput.writeObject("question deleted");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if (type == Message.KEYWORDS) {
+
+			
+			MongoCollection<Document> collection = database.getCollection("Keywords");
+			Iterator<Document>itr = collection.find().iterator();
+			ArrayList<String>list = new ArrayList<>();
+			while(itr.hasNext()){
+				Document doc = itr.next();
+				System.out.println(doc.getString("keyword"));
+				list.add(doc.getString("keyword"));
+			}
+			
+			String arr[] = new String[list.size()];
+			for(int i=0; i<list.size(); i++){
+				arr[i] = list.get(i);
+			}
+			
+			try {
+				sOutput.writeObject(arr);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+
 		return 0;
+	}
+	
+	void saveImg(String path, String username){
+		
+		//String newFileName = "mkyong-java-image";
+		DB db = ((GridFS) database).getDB();
+		File imageFile = new File(path);
+		GridFS gfsPhoto = new GridFS(db, "photo");
+		GridFSInputFile gfsFile = null;
+		try {
+			gfsFile = gfsPhoto.createFile(imageFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		gfsFile.setFilename(username);
+		gfsFile.save();
+	}
+	
+	void showImg(String username){
+		
+		//String newFileName = "mkyong-java-image";
+		GridFS gfsPhoto = new GridFS((DB) database, "photo");
+		GridFSDBFile imageForOutput = gfsPhoto.findOne(username);
+		try {
+			imageForOutput.writeTo("C:\\Users\\Fateme\\workspace\\StackOverflow\\userphoto.png");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	// for a Client who logoff using the LOGOUT message
@@ -277,7 +426,8 @@ public class Server {
 			id = ++uniqueId;
 			this.socket = socket;
 			/* Creating both Data Stream */
-			System.out.println("Thread trying to create Object Input/Output Streams");
+			// System.out.println("Thread trying to create Object Input/Output
+			// Streams");
 			try {
 				// create output first
 				sOutput = new ObjectOutputStream(socket.getOutputStream());
@@ -318,9 +468,10 @@ public class Server {
 
 				case Message.REGISTER:
 					// System.out.println("humm");
-					if (answer(3, message, sOutput) == 1) {
-						writeMsg("ErrUsrExist");
-					}
+					answer(3, message, sOutput);
+//					if (answer(3, message, sOutput) == 1) {
+//						writeMsg("ErrUsrExist");
+//					}
 					break;
 				case Message.LOGOUT:
 					display(username + " disconnected with a LOGOUT message.");
@@ -333,23 +484,47 @@ public class Server {
 						writeMsg("WrongUserOrPassword");
 					} // else
 						// writeMsg(intrestList);
-					// answer(1, message, sOutput);
-					// writeMsg("List of the users connected at " +
-					// sdf.format(new Date()) + "\n");
-					// // scan al the users connected
-					// for (int i = 0; i < al.size(); ++i) {
-					// ClientThread ct = al.get(i);
-					// writeMsg((i + 1) + ") " + ct.username + " since " +
-					// ct.date);
-					// }
+						// answer(1, message, sOutput);
+						// writeMsg("List of the users connected at " +
+						// sdf.format(new Date()) + "\n");
+						// // scan al the users connected
+						// for (int i = 0; i < al.size(); ++i) {
+						// ClientThread ct = al.get(i);
+						// writeMsg((i + 1) + ") " + ct.username + " since " +
+						// ct.date);
+						// }
 					break;
-					
+
 				case Message.ADD:
 					answer(Message.ADD, message, sOutput);
-				}
-				
-				
+					break;
+
+				case Message.SEARCH:
+					message = cm.getMessage();
+					answer(Message.SEARCH, message, sOutput);
+					break;
+
+				case Message.ANSWER:
+					message = cm.messageObject;
+					Question q = (Question)message;
+//					if(q==null){
+//						System.out.println("aah");
+//					}
+					answer(Message.ANSWER, message, sOutput);
+					break;
 					
+				case Message.DELETE:
+					message = cm.getMessage();
+					answer(Message.DELETE, message, sOutput);
+					break;
+					
+				case Message.KEYWORDS:
+					message = cm.getMessage();
+					answer(Message.KEYWORDS, message, sOutput);
+					break;
+
+				}
+
 			}
 			// remove myself from the arrayList containing the list of the
 			// connected Clients

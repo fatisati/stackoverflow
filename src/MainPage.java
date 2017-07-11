@@ -1,35 +1,44 @@
+
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import java.awt.Container;
 
 public class MainPage extends JPanel implements ActionListener {
 	Dimension d;
 	JFrame j;
-	JButton search, save, java, C, SQL, Verilog, VHDL;
-	JTextField question;
+	JButton search, submit ,seequestions, setting, java, C, SQL, Verilog, VHDL;
+	JTextField question, tags, result;
+	JTextArea squestion;
+	JComboBox jb;
+	JComboBox ji;
 	private int b;
 	private int m = 80;
 	private int i;
 	private int n;
 	private Userz u;
 	private Client c;
-	public String[] interest = new String[5];
-	JTextArea ja;
+	String[] sl;
+	String[] si;
+	ArrayList<String> interest = new ArrayList<String>();
 
 	public MainPage(Client client, Userz user) {
 		u = user;
 		c = client;
+		interest = u.interest;
 		d = Toolkit.getDefaultToolkit().getScreenSize();
 		j = new JFrame();
-		setSize(800, 560);
-		j.setSize(800, 560);
+		setSize(1150, 700);
+		j.setSize(1150, 700);
 		setLocation(0, 0);
 		j.setLocation(90, 0);
 		setLayout(null);
@@ -38,20 +47,35 @@ public class MainPage extends JPanel implements ActionListener {
 
 		search = new JButton("search");
 		search.setSize(100, 30);
-		search.setLocation(570, 380);
+		search.setLocation(570, 30);
+		
+		seequestions = new JButton("seequestions");
+		seequestions.setSize(150, 50);
+		seequestions.setLocation(570, 120);
 
-		save = new JButton("save");
-		save.setSize(100, 30);
-		save.setLocation(680, 380);
+		submit = new JButton("submit");
+		submit.setSize(100, 30);
+		submit.setLocation(840, 500);
+
+		setting = new JButton("setting");
+		setting.setSize(100, 30);
+		setting.setLocation(50, 500);
 
 		question = new JTextField();
 		question.setSize(550, 30);
-		question.setLocation(10, 380);
-		
-		ja = new JTextArea();
-		ja.setSize(500, 300);
-		ja.setLocation(10, 70);
-		this.add(ja);
+		question.setLocation(10, 30);
+
+		tags = new JTextField();
+		tags.setSize(400, 30);
+		tags.setLocation(690, 450);
+
+		result = new JTextField();
+		result.setSize(400, 30);
+		result.setLocation(690, 550);
+
+		squestion = new JTextArea();
+		squestion.setSize(400, 400);
+		squestion.setLocation(690, 30);
 
 		C = new JButton("C");
 		C.setSize(100, 30);
@@ -69,59 +93,82 @@ public class MainPage extends JPanel implements ActionListener {
 		VHDL.setSize(100, 30);
 		VHDL.setLocation(680, 240);
 
-		this.add(save);
+//		this.si = new String[] { "A", "B" };
+//		ji = new JComboBox((ComboBoxModel) interest);
+//		ji.setSize(200, 20);
+//		ji.setLocation(230, 80);
+
+		this.add(submit);
 		this.add(search);
 		this.add(question);
+		this.add(squestion);
+		this.add(tags);
+		this.add(result);
+		this.add(setting);
+        sl = new String[interest.size()];
 		if (u.interest != null) {
-			for (i = 0; i < 5; i++) {
-				b = u.interest[i];
-				if (b == 1) {
-					if (i == 0) {
-						java = new JButton("java");
-						java.setSize(100, 30);
-						java.setLocation(680, m);
-						m = m + 40;
-						this.add(java);
-						java.addActionListener(this);
+              for(int i=0 ; i < interest.size() ; i++){
+            	  if(interest.get(i).equals("java")){
+            		    sl[i] = "java";
+//						java = new JButton("java");
+//						java.setSize(100, 30);
+//						java.setLocation(680, m);
+//						m = m + 40;
+//						this.add(java);
+//						java.addActionListener(this);
 					}
-					if (i == 1) {
-						C = new JButton("C");
-						C.setSize(100, 30);
-						C.setLocation(680, m);
-						m = m + 40;
-						this.add(C);
-						C.addActionListener(this);
+            	  if(interest.get(i).equals("C")){
+            		    sl[i] = "C";
+//						C = new JButton("C");
+//						C.setSize(100, 30);
+//						C.setLocation(680, m);
+//						m = m + 40;
+//						this.add(C);
+//						C.addActionListener(this);
 					}
-					if (i == 2) {
-						SQL = new JButton("SQL");
-						SQL.setSize(100, 30);
-						SQL.setLocation(680, m);
-						m = m + 40;
-						this.add(SQL);
-						SQL.addActionListener(this);
+            	  if(interest.get(i).equals("SQL")){
+            		    sl[i] = "SQL";
+//						SQL = new JButton("SQL");
+//						SQL.setSize(100, 30);
+//						SQL.setLocation(680, m);
+//						m = m + 40;
+//						this.add(SQL);
+//						SQL.addActionListener(this);
 					}
-					if (i == 3) {
-						Verilog = new JButton("Verilog");
-						Verilog.setSize(100, 30);
-						Verilog.setLocation(680, m);
-						m = m + 40;
-						this.add(Verilog);
-						Verilog.addActionListener(this);
+            	  if(interest.get(i).equals("Verilog")){
+            		    sl[i] = "Verilog";
+//						Verilog = new JButton("Verilog");
+//						Verilog.setSize(100, 30);
+//						Verilog.setLocation(680, m);
+//						m = m + 40;
+//						this.add(Verilog);
+//						Verilog.addActionListener(this);
 					}
-					if (i == 4) {
-						VHDL = new JButton("VHDL");
-						VHDL.setSize(100, 30);
-						VHDL.setLocation(680, m);
-						m = m + 40;
-						this.add(VHDL);
-						VHDL.addActionListener(this);
+            	  if(interest.get(i).equals("VHDL")){
+            		    sl[i] = "VHDL";
+//						VHDL = new JButton("VHDL");
+//						VHDL.setSize(100, 30);
+//						VHDL.setLocation(680, m);
+//						m = m + 40;
+//						this.add(VHDL);
+//						VHDL.addActionListener(this);
 					}
 				}
 			}
-		}
-
+		jb = new JComboBox(sl);
+		jb.setSize(200, 20);
+		jb.setLocation(10, 80);
+		
+		this.add(jb);
+//		this.add(ji);
+		this.add(seequestions);
 		search.addActionListener(this);
-		save.addActionListener(this);
+		seequestions.addActionListener(this);
+		submit.addActionListener(this);
+		jb.addActionListener(this);
+		jb.setActionCommand("jb");
+//		ji.addActionListener(this);
+//		ji.setActionCommand("ji");
 		j.getContentPane().add(this);
 		setVisible(true);
 		j.setVisible(true);
@@ -130,12 +177,33 @@ public class MainPage extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
-		if (arg0.getSource() == save) {
-			
-			Question q = new Question(ja.getText(),question.getText(), u);
+		if (arg0.getSource() == submit) {
+
+			Question q = new Question(squestion.getText(), tags.getText(), u);
 			c.sendMessage(new Message(Message.ADD, q));
 		}
 
+		if (arg0.getSource() == search) {
+
+			c.sendMessage(new Message(Message.SEARCH, question.getText()));
+			//System.out.println("msg sent");
+		}
+
 	}
+
+	// @Override
+	// public void actionPerformed(ActionEvent arg0) {
+	// // TODO Auto-generated method stub
+	// if (arg0.getSource() == submit) {
+	//
+	// Question q = new Question(ja.getText(), question.getText(), u);
+	// c.sendMessage(new Message(Message.ADD, q));
+	// }
+	//
+	// if (arg0.getSource() == search) {
+	//
+	// c.sendMessage(new Message(Message.SEARCH, ""));
+	// System.out.println("msg sent");
+	// }
 
 }
