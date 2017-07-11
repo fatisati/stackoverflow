@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -142,45 +143,43 @@ public class AnswerPage extends JPanel implements ActionListener {
 				if (q.answers == null) {
 					q.answers = new ArrayList<>();
 				}
-				q.answers.add(new Answer(scomment.getText(), u.username));
+				q.answers.add(new Answer(scomment.getText(), u.username, new Date()));
 				c.sendMessage(new Message(Message.ANSWER, q));
 			}
 		}
 
 		for (int k = 0; k < up.size(); k++) {
 			if (arg0.getSource() == up.get(k)) {
-				
-				if(isdown[k]){
-					q.answers.get(k).mark+=2;
-				}
-				else if(!isup[k]){
+
+				if (isdown[k]) {
+					q.answers.get(k).mark += 2;
+				} else if (!isup[k]) {
 					q.answers.get(k).mark++;
 				}
 				isup[k] = true;
 				isdown[k] = false;
-				
+
 			}
-			//System.out.println("got it");
+			// System.out.println("got it");
 			c.sendMessage(new Message(Message.ANSWER, q));
 			mark.get(k).setText(Integer.toString(q.answers.get(k).mark));
-			
+
 		}
 
-		for (int k= 0; k < down.size(); k++) {
+		for (int k = 0; k < down.size(); k++) {
 			if (arg0.getSource() == down.get(k)) {
- 				if(isup[k]){
-					q.answers.get(k).mark-=2;
-				}
-				else if(!isdown[k]){
+				if (isup[k]) {
+					q.answers.get(k).mark -= 2;
+				} else if (!isdown[k]) {
 					q.answers.get(k).mark--;
 				}
 				isdown[k] = true;
 				isup[k] = false;
-				
+
 			}
 			c.sendMessage(new Message(Message.ANSWER, q));
 			mark.get(k).setText(Integer.toString(q.answers.get(k).mark));
-			
+
 		}
 
 	}

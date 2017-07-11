@@ -217,7 +217,8 @@ public class Server {
 			Question q = (Question) message;
 			Document doc = new Document("content", q.content);
 
-			doc.append("keywords", q.keywords).append("writer", q.writer.username).append("answers", q.answers);
+			doc.append("keywords", q.keywords).append("username", q.username).append("answers", null)
+					.append("comments", null).append("mark", q.mark);
 
 			for (String keyword : q.keywords) {
 
@@ -252,15 +253,15 @@ public class Server {
 		}
 
 		if (type == Message.SEARCH) {
-			
+
 			System.out.println("server got serch");
 			String content = (String) message;
 
 			StringBuilder keywords = new StringBuilder();
 			MongoCollection<Document> collection = database.getCollection("Question");
 			MongoCollection<Document> kewordsCollection = database.getCollection("Keywords");
-//			collection.deleteMany(new Document());
-//			kewordsCollection.deleteMany(new Document());
+			collection.deleteMany(new Document());
+			// kewordsCollection.deleteMany(new Document());
 			String arr[] = content.split(" ");
 
 			for (String key : arr) {
@@ -268,30 +269,15 @@ public class Server {
 					keywords.append(key + " ");
 				}
 			}
-			//System.out.println("keyword "+keywords.toString());
+			// System.out.println("keyword "+keywords.toString());
 			collection.createIndex(Indexes.text("keywords"));
 			Iterator<Document> itr = collection.find(Filters.text(keywords.toString()))
 					.projection(Projections.metaTextScore("score")).sort(Sorts.metaTextScore("score")).iterator();
 			ArrayList<Question> questions = new ArrayList<>();
 			while (itr.hasNext()) {
-				
-				Document d = itr.next();
-				//System.out.println(d.toJson());
-				Question q = new Question(d.getString("content"), (ArrayList<String>) d.get("keywords"));
-				ArrayList<Document> docs = (ArrayList<Document>) d.get("answers");
-				ArrayList<Answer> answers = new ArrayList<>();
 
-				for (Document doc : docs) {
-					Answer ans = new Answer(doc.getString("content"), doc.getString("username"));
-					ans.mark = doc.getInteger("mark", 0);
-					ans.comments = (ArrayList<String>) doc.get("comments");
-					answers.add(ans);
-				}
-				q.answers = answers;
-				if (q.answers == null) {
-					q.answers = new ArrayList<>();
-				}
-				questions.add(q);
+				Document d = itr.next();
+				questions.add(new Question(d));
 			}
 
 			try {
@@ -315,16 +301,13 @@ public class Server {
 				System.out.println("null q");
 			}
 
-			ArrayList<Document> docs = new ArrayList<>();
+			ArrayList<Document> ansdoc = new ArrayList<>();
 			for (Answer ans : q.answers) {
-				Document doc = new Document("username", ans.username);
-				doc.append("content", ans.content).append("mark", ans.mark).append("comments", ans.comments);
-				docs.add(doc);
-				// answersCollection.insertOne(doc);
+				ansdoc.add(ans.toDocument());
 			}
 
 			collection.updateOne(and(eq("content", q.content), eq("keywords", q.keywords)),
-					new Document("$set", new Document("answers", docs)));
+					new Document("$set", new Document("answers", ansdoc)));
 
 			try {
 				sOutput.writeObject("your answer added successfully");
@@ -377,36 +360,40 @@ public class Server {
 			MongoCollection<Document> collection = database.getCollection("Question");
 			Iterator<Document> itr = collection.find().iterator();
 			ArrayList<Question> questions = new ArrayList<>();
-			while (itr.hasNext()) {
-
-				Document d = itr.next();
-				Question q = new Question(d.getString("content"), (ArrayList<String>) d.get("keywords"));
-
-				ArrayList<Document> docs = (ArrayList<Document>) d.get("answers");
-				ArrayList<Answer> answers = new ArrayList<>();
-
-//				if (docs != null) {
-//					for (Document doc : docs) {
-//						Answer ans = new Answer(doc.getString("content"), doc.getString("username"));
-//						ans.mark = doc.getInteger("mark", 0);
-//						ans.comments = (ArrayList<String>) doc.get("comments");
-//						answers.add(ans);
-//					}
-//				}
-//				q.answers = answers;
-				if (q.answers == null) {
-					q.answers = new ArrayList<>();
-				}
-
-				// q.answers = (ArrayList<String>) d.get("answers");
-				// if(q.answers == null){
-				// q.answers = new ArrayList<>();
-				// }
-				questions.add(q);
-			}
+			// while (itr.hasNext()) {
+			//
+			// Document d = itr.next();
+			// Question q = new Question(d.getString("content"),
+			// (ArrayList<String>) d.get("keywords"));
+			//
+			// ArrayList<Document> docs = (ArrayList<Document>)
+			// d.get("answers");
+			// ArrayList<Answer> answers = new ArrayList<>();
+			//
+			// // if (docs != null) {
+			// // for (Document doc : docs) {
+			// // Answer ans = new Answer(doc.getString("content"),
+			// // doc.getString("username"));
+			// // ans.mark = doc.getInteger("mark", 0);
+			// // ans.comments = (ArrayList<String>) doc.get("comments");
+			// // answers.add(ans);
+			// // }
+			// // }
+			// // q.answers = answers;
+			// if (q.answers == null) {
+			// q.answers = new ArrayList<>();
+			// }
+			//
+			// // q.answers = (ArrayList<String>) d.get("answers");
+			// // if(q.answers == null){
+			// // q.answers = new ArrayList<>();
+			// // }
+			// questions.add(q);
+			// }
 
 			try {
-				//System.out.println("zahrasadara inahash dige" + questions.size());
+				// System.out.println("zahrasadara inahash dige" +
+				// questions.size());
 				sOutput.writeObject(questions);
 				// System.out.println(questions.get(0).content+" hemm");
 			} catch (IOException e) {

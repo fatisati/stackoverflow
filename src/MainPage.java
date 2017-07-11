@@ -4,6 +4,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
@@ -16,7 +17,7 @@ import javax.swing.JTextField;
 public class MainPage extends JPanel implements ActionListener {
 	Dimension d;
 	JFrame j;
-	JButton search, submit ,allquestions, setting, java, C, SQL, Verilog, VHDL;
+	JButton search, submit, allquestions, setting, java, C, SQL, Verilog, VHDL;
 	JTextField question, tags, result;
 	JTextArea squestion;
 	JComboBox interests;
@@ -48,7 +49,7 @@ public class MainPage extends JPanel implements ActionListener {
 		search = new JButton("search");
 		search.setSize(100, 30);
 		search.setLocation(570, 30);
-		
+
 		allquestions = new JButton("seequestions");
 		allquestions.setSize(150, 50);
 		allquestions.setLocation(550, 120);
@@ -100,66 +101,66 @@ public class MainPage extends JPanel implements ActionListener {
 		this.add(tags);
 		this.add(result);
 		this.add(setting);
-        sl = new String[interest.size()];
-        si = new String[c.keywords.length];
-        si = c.keywords;
+		sl = new String[interest.size()];
+		si = new String[c.keywords.length];
+		si = c.keywords;
 		if (u.interest != null) {
-              for(int i=0 ; i < interest.size() ; i++){
-            	  if(interest.get(i).equals("java")){
-            		    sl[i] = "java";
-//						java = new JButton("java");
-//						java.setSize(100, 30);
-//						java.setLocation(680, m);
-//						m = m + 40;
-//						this.add(java);
-//						java.addActionListener(this);
-					}
-            	  if(interest.get(i).equals("C")){
-            		    sl[i] = "C";
-//						C = new JButton("C");
-//						C.setSize(100, 30);
-//						C.setLocation(680, m);
-//						m = m + 40;
-//						this.add(C);
-//						C.addActionListener(this);
-					}
-            	  if(interest.get(i).equals("SQL")){
-            		    sl[i] = "SQL";
-//						SQL = new JButton("SQL");
-//						SQL.setSize(100, 30);
-//						SQL.setLocation(680, m);
-//						m = m + 40;
-//						this.add(SQL);
-//						SQL.addActionListener(this);
-					}
-            	  if(interest.get(i).equals("Verilog")){
-            		    sl[i] = "Verilog";
-//						Verilog = new JButton("Verilog");
-//						Verilog.setSize(100, 30);
-//						Verilog.setLocation(680, m);
-//						m = m + 40;
-//						this.add(Verilog);
-//						Verilog.addActionListener(this);
-					}
-            	  if(interest.get(i).equals("VHDL")){
-            		    sl[i] = "VHDL";
-//						VHDL = new JButton("VHDL");
-//						VHDL.setSize(100, 30);
-//						VHDL.setLocation(680, m);
-//						m = m + 40;
-//						this.add(VHDL);
-//						VHDL.addActionListener(this);
-					}
+			for (int i = 0; i < interest.size(); i++) {
+				if (interest.get(i).equals("java")) {
+					sl[i] = "java";
+					// java = new JButton("java");
+					// java.setSize(100, 30);
+					// java.setLocation(680, m);
+					// m = m + 40;
+					// this.add(java);
+					// java.addActionListener(this);
+				}
+				if (interest.get(i).equals("C")) {
+					sl[i] = "C";
+					// C = new JButton("C");
+					// C.setSize(100, 30);
+					// C.setLocation(680, m);
+					// m = m + 40;
+					// this.add(C);
+					// C.addActionListener(this);
+				}
+				if (interest.get(i).equals("SQL")) {
+					sl[i] = "SQL";
+					// SQL = new JButton("SQL");
+					// SQL.setSize(100, 30);
+					// SQL.setLocation(680, m);
+					// m = m + 40;
+					// this.add(SQL);
+					// SQL.addActionListener(this);
+				}
+				if (interest.get(i).equals("Verilog")) {
+					sl[i] = "Verilog";
+					// Verilog = new JButton("Verilog");
+					// Verilog.setSize(100, 30);
+					// Verilog.setLocation(680, m);
+					// m = m + 40;
+					// this.add(Verilog);
+					// Verilog.addActionListener(this);
+				}
+				if (interest.get(i).equals("VHDL")) {
+					sl[i] = "VHDL";
+					// VHDL = new JButton("VHDL");
+					// VHDL.setSize(100, 30);
+					// VHDL.setLocation(680, m);
+					// m = m + 40;
+					// this.add(VHDL);
+					// VHDL.addActionListener(this);
 				}
 			}
+		}
 		interests = new JComboBox(sl);
 		interests.setSize(200, 20);
 		interests.setLocation(10, 80);
-		
+
 		keyword = new JComboBox(si);
 		keyword.setSize(200, 20);
 		keyword.setLocation(230, 80);
-		
+
 		this.add(interests);
 		this.add(keyword);
 		this.add(allquestions);
@@ -180,30 +181,30 @@ public class MainPage extends JPanel implements ActionListener {
 		// TODO Auto-generated method stub
 		if (arg0.getSource() == submit) {
 
-			Question q = new Question(squestion.getText(), tags.getText(), u);
+			Question q = new Question(squestion.getText(), tags.getText(), u, new Date());
 			c.sendMessage(new Message(Message.ADD, q));
 		}
 
 		if (arg0.getSource() == search) {
 
 			c.sendMessage(new Message(Message.SEARCH, question.getText()));
-			//System.out.println("msg sent");
+			// System.out.println("msg sent");
 		}
-		
+
 		if (arg0.getSource() == allquestions) {
-            c.sendMessage(new Message(Message.SEARCH,"allquestions"));
-			//System.out.println("msg sent");
+			c.sendMessage(new Message(Message.SEARCH, "allquestions"));
+			// System.out.println("msg sent");
 		}
-		
+
 		if (arg0.getActionCommand().equals("interests")) {
-		    String selectItem = (String) interests.getSelectedItem();
-		    c.sendMessage(new Message(Message.SEARCH, selectItem));
-		  }
-		  if (arg0.getActionCommand().equals("keyword")) {
-		    String selectItem = (String) keyword.getSelectedItem();
-		    c.sendMessage(new Message(Message.SEARCH, selectItem));
-		    System.out.println("hhhh");
-		  }
+			String selectItem = (String) interests.getSelectedItem();
+			c.sendMessage(new Message(Message.SEARCH, selectItem));
+		}
+		if (arg0.getActionCommand().equals("keyword")) {
+			String selectItem = (String) keyword.getSelectedItem();
+			c.sendMessage(new Message(Message.SEARCH, selectItem));
+			System.out.println("hhhh");
+		}
 
 	}
 
