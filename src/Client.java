@@ -27,14 +27,14 @@ public class Client {
 	JLabel label;
 	Userz u;
 	String keywords[];
-	//ListenFromServer lf;
+	// ListenFromServer lf;
 
 	Client(String server, int port, String username) {
 		this.server = server;
 		this.port = port;
 		this.username = username;
 		islogin = false;
-		//lf = new ListenFromServer(this);
+		// lf = new ListenFromServer(this);
 		// this.label = label;
 	}
 
@@ -63,7 +63,7 @@ public class Client {
 
 		// creates the Thread to listen from the Server
 		new ListenFromServer(this).start();
-		//lf.start();
+		// lf.start();
 		// Send our username to the Server this is the only message that we
 		// will send as a String. All other messages will be Message objects
 		try {
@@ -177,15 +177,14 @@ public class Client {
 					Object obj = sInput.readObject();
 
 					if (obj instanceof String) {
-						String msg = (String) sInput.readObject();
+						String msg = (String) obj;
 						// System.out.println(msg);
 						if (msg.equals("WrongUserOrPassword")) {
 							// System.out.println("hey i'm here");
 							JOptionPane.showMessageDialog(null, "wrong username or password");
+						} else {
+							System.out.println("client msg: "+msg);;
 						}
-//						} else {
-//							JOptionPane.showMessageDialog(null, msg);
-//						}
 					}
 
 					if (obj instanceof Userz) {
@@ -201,16 +200,16 @@ public class Client {
 						System.out.println("hey here");
 						ArrayList<Question> q = (ArrayList<Question>) obj;
 
-						System.out.println(q.get(0).content);
+						// System.out.println(q.get(0).content);
 						new QuestionPage(client, u, q);
 
 						// System.out.println("here");
 					}
-					
+
 					if (obj instanceof String[]) {
-						//System.out.println("accepted");
+						// System.out.println("accepted");
 						client.keywords = (String[]) obj;
-						//System.out.println(client.keywords[0]);
+						// System.out.println(client.keywords[0]);
 					}
 
 					// if console mode print the message and add back the prompt

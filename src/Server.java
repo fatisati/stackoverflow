@@ -215,10 +215,10 @@ public class Server {
 			MongoCollection<Document> keywordsCollection = database.getCollection("Keywords");
 
 			Question q = (Question) message;
-			Document doc = new Document("content", q.content);
+			Document doc = q.toDocument();//new Document("content", q.content);
 
-			doc.append("keywords", q.keywords).append("username", q.username).append("answers", null)
-					.append("comments", null).append("mark", q.mark);
+//			doc.append("keywords", q.keywords).append("username", q.username).append("answers", null)
+//					.append("comments", null).append("mark", q.mark);
 
 			for (String keyword : q.keywords) {
 
@@ -260,7 +260,7 @@ public class Server {
 			StringBuilder keywords = new StringBuilder();
 			MongoCollection<Document> collection = database.getCollection("Question");
 			MongoCollection<Document> kewordsCollection = database.getCollection("Keywords");
-			collection.deleteMany(new Document());
+			//collection.deleteMany(new Document());
 			// kewordsCollection.deleteMany(new Document());
 			String arr[] = content.split(" ");
 
