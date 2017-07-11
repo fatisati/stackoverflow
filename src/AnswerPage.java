@@ -59,7 +59,7 @@ public class AnswerPage extends JPanel implements ActionListener {
 			System.out.println("answers");
 		}
 		for (int i = 0; i < q.answers.size(); i++) {
-			answers.add(new JLabel(q.answers.get(i)));
+			answers.add(new JLabel(q.answers.get(i).content));
 			answers.get(i).setSize(800, 30);
 			answers.get(i).setLocation(10, 70 + (70 * i));
 			this.add(answers.get(i));
@@ -124,8 +124,17 @@ public class AnswerPage extends JPanel implements ActionListener {
 				System.out.println("hey this q is null");
 			}
 			// System.out.println("hi");
-			q.answers.add(scomment.getText());
-			c.sendMessage(new Message(Message.ANSWER, q));
+			boolean flag = false;
+			for(Answer ans: q.answers){
+				if(ans.content.equals(scomment.getText())){
+					flag = true;
+				}
+			}
+			if(!flag){
+				q.answers.add(new Answer(scomment.getText(), u.username));
+				c.sendMessage(new Message(Message.ANSWER, q));
+			}
+			
 			// System.out.println("what");
 		}
 

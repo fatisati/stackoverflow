@@ -273,7 +273,16 @@ public class Server {
 
 				Document d = itr.next();
 				Question q = new Question(d.getString("content"), (ArrayList<String>) d.get("keywords"));
-				q.answers = (ArrayList<String>) d.get("answers");
+				ArrayList<Document>docs = (ArrayList<Document>) d.get("answers");
+				ArrayList<Answer>answers = new ArrayList<>();
+				
+				for(Document doc: docs){
+					Answer ans = new Answer(doc.getString("content"), doc.getString("username"));
+					ans.mark = doc.getInteger("mark", 0);
+					ans.comments = (ArrayList<String>)doc.get("comments");
+					answers.add(ans);
+				}
+				q.answers = answers;
 				if(q.answers == null){
 					q.answers = new ArrayList<>();
 				}
@@ -292,21 +301,35 @@ public class Server {
 		}
 
 		if (type == Message.ANSWER) {
-			System.out.println("answers");
+			//System.out.println("answers");
 			Question q = (Question) message;
 			MongoCollection<Document> collection = database.getCollection("Question");
+			MongoCollection<Document> answersCollection = database.getCollection("Answers");
+
 			if(q == null){
-				System.out.println("q");
+				System.out.println("null q");
 			}
-			System.out.println("here "+q.answers.size());
+			
+			
+			
+			ArrayList<Document>docs = new ArrayList<>();
+			for(Answer ans: q.answers){
+				Document doc = new Document("username", ans.username);
+				doc.append("content", ans.content).append("mark", ans.mark).append("comments", ans.comments);
+				docs.add(doc);
+				//answersCollection.insertOne(doc);
+			}
+			
 			collection.updateOne(and(eq("content", q.content), eq("keywords", q.keywords)),
-					new Document("$set", new Document("answers", q.answers)));
+					new Document("$set", new Document("answers", docs)));
+			
 			try {
 				sOutput.writeObject("your answer added successfully");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
 		}
 		
 		if (type == Message.DELETE) {
