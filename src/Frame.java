@@ -13,7 +13,7 @@ import javax.swing.JTextField;
 
 public class Frame extends JFrame implements ActionListener {
 	Dimension d;
-	JButton search, signin, signup,seequestions;
+	JButton search, signin, signup, allquestions;
 	JTextField question, username, password;
 	JLabel luser, lpass, q;
 	JComboBox jb;
@@ -29,11 +29,11 @@ public class Frame extends JFrame implements ActionListener {
 	// QuestionPage qp;
 	public Frame() {
 		c = new Client("127.0.0.1", 8000, "signup");
-	    c.start();
-	    c.sendMessage(new Message(Message.KEYWORDS, null));
-	    while(c.keywords==null){
-	    }
-	    System.out.println("here");
+		c.start();
+		c.sendMessage(new Message(Message.KEYWORDS, null));
+		while (c.keywords == null) {
+		}
+		System.out.println("here");
 		this.p = p;
 		d = Toolkit.getDefaultToolkit().getScreenSize();
 		setSize(1150, 700);
@@ -44,10 +44,10 @@ public class Frame extends JFrame implements ActionListener {
 		search = new JButton("search");
 		search.setSize(100, 50);
 		search.setLocation(570, 50);
-		
-		seequestions = new JButton("seequestions");
-		seequestions.setSize(150, 50);
-		seequestions.setLocation(570, 120);
+
+		allquestions = new JButton("allquestions");
+		allquestions.setSize(150, 50);
+		allquestions.setLocation(570, 120);
 
 		signin = new JButton("signin");
 		signin.setSize(80, 30);
@@ -81,14 +81,14 @@ public class Frame extends JFrame implements ActionListener {
 		q.setSize(150, 20);
 		q.setLocation(10, 20);
 		sg = new String[c.keywords.length];
-		//sl = getarray();
+		// sl = getarray();
 		// this.sg = getarray();
 		jb = new JComboBox(sg);
 		jb.setSize(200, 20);
 		jb.setLocation(10, 120);
 
 		getContentPane().add(search);
-		getContentPane().add(seequestions);
+		getContentPane().add(allquestions);
 		getContentPane().add(signin);
 		getContentPane().add(signup);
 		getContentPane().add(question);
@@ -98,7 +98,7 @@ public class Frame extends JFrame implements ActionListener {
 		getContentPane().add(lpass);
 		getContentPane().add(q);
 		getContentPane().add(jb);
-		seequestions.addActionListener(this);
+		allquestions.addActionListener(this);
 		search.addActionListener(this);
 		signin.addActionListener(this);
 		signup.addActionListener(this);
@@ -121,6 +121,7 @@ public class Frame extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
 		if (arg0.getSource() == search) {
+			System.out.println(question.getText());
 			c.sendMessage(new Message(Message.SEARCH, question.getText()));
 		}
 
@@ -133,32 +134,30 @@ public class Frame extends JFrame implements ActionListener {
 			}
 			Userz u = new Userz("", username.getText(), "", password.getText(), null);
 			c.sendMessage(new Message(Message.LOGIN, u));
-			
-			//boolean flag = true;
-//			try {
-//				wait(100);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-			
-//			try {
-//				Thread.sleep(100);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			
-//			System.out.println("qq");
-//			if (c.islogin == false) {
-//				JOptionPane.showMessageDialog(null, "wrong username or password");
-//				//flag = false;
-//			} else{
-//				mp = new MainPage(c, u);
-//			}
-		}
-		if (arg0.getSource() == seequestions) {
-			
+
+			// boolean flag = true;
+			// try {
+			// wait(100);
+			// } catch (InterruptedException e) {
+			// // TODO Auto-generated catch block
+			// e.printStackTrace();
+			// }
+
+			// try {
+			// Thread.sleep(100);
+			// } catch (InterruptedException e) {
+			// // TODO Auto-generated catch block
+			// e.printStackTrace();
+			// }
+			//
+			// System.out.println("qq");
+			// if (c.islogin == false) {
+			// JOptionPane.showMessageDialog(null, "wrong username or
+			// password");
+			// //flag = false;
+			// } else{
+			// mp = new MainPage(c, u);
+			// }
 		}
 		if (arg0.getSource() == signup) {
 			// sp = new Signup(c);
@@ -168,11 +167,13 @@ public class Frame extends JFrame implements ActionListener {
 		}
 
 		if (arg0.getActionCommand().equals("subject")) {
-			String selectItem = (String) jb.getSelectedItem();
-			if (selectItem.equals("all")) {
-				sp = new Signup(c);
-			}
+		      String selectItem = (String) jb.getSelectedItem();
+		      c.sendMessage(new Message(Message.SEARCH, selectItem));
 
+		    }
+
+		if (arg0.getSource() == allquestions) {
+			c.sendMessage(new Message(Message.VIEWALL, "allquestions"));
 		}
 	}
 

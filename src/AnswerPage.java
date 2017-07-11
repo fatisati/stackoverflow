@@ -26,11 +26,16 @@ public class AnswerPage extends JPanel implements ActionListener {
 	ArrayList<JButton> down = new ArrayList<JButton>();
 	JScrollPane scroll;
 	JTextArea scomment;
+
 	JButton comment;
 	JButton submit;
+	boolean isup[], isdown[];
 
 	public AnswerPage(Client client, Userz user, Question q) {
 		// TODO Auto-generated constructor stub
+		isup = new boolean[q.answers.size()];
+		isdown = new boolean[q.answers.size()];
+		System.out.println(isup[0]);
 		u = user;
 		c = client;
 		d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -64,19 +69,21 @@ public class AnswerPage extends JPanel implements ActionListener {
 			answers.get(i).setLocation(10, 70 + (70 * i));
 			this.add(answers.get(i));
 
-			// mark.add(new JLabel(q.answers.get(i).mark));
-			// mark.get(i).setSize(40, 30);
-			// mark.get(i).setLocation(780, 90+(70*i));
-			// this.add(answers.get(i));
+			mark.add(new JLabel(Integer.toString(q.answers.get(i).mark)));
+			mark.get(i).setSize(40, 30);
+			mark.get(i).setLocation(780, 90 + (70 * i));
+			this.add(mark.get(i));
 
 			up.add(new JButton("up"));
 			up.get(i).setSize(100, 15);
 			up.get(i).setLocation(820, 70 + (70 * i));
+			up.get(i).addActionListener(this);
 			this.add(up.get(i));
 
 			down.add(new JButton("down"));
 			down.get(i).setSize(100, 15);
 			down.get(i).setLocation(820, 90 + (70 * i));
+			down.get(i).addActionListener(this);
 			this.add(down.get(i));
 			// comment.add(new JTextArea());
 			// comments.get(i).setSize(800, 100);
@@ -125,17 +132,55 @@ public class AnswerPage extends JPanel implements ActionListener {
 			}
 			// System.out.println("hi");
 			boolean flag = false;
-			for(Answer ans: q.answers){
-				if(ans.content.equals(scomment.getText())){
+			for (Answer ans : q.answers) {
+				if (ans.content.equals(scomment.getText())) {
 					flag = true;
 				}
 			}
-			if(!flag){
+			if (!flag) {
+
+				if (q.answers == null) {
+					q.answers = new ArrayList<>();
+				}
 				q.answers.add(new Answer(scomment.getText(), u.username));
 				c.sendMessage(new Message(Message.ANSWER, q));
 			}
+		}
+
+		for (int k = 0; k < up.size(); k++) {
+			if (arg0.getSource() == up.get(k)) {
+				
+				if(isdown[k]){
+					q.answers.get(k).mark+=2;
+				}
+				else if(!isup[k]){
+					q.answers.get(k).mark++;
+				}
+				isup[k] = true;
+				isdown[k] = false;
+				
+			}
+			//System.out.println("got it");
+			c.sendMessage(new Message(Message.ANSWER, q));
+			mark.get(k).setText(Integer.toString(q.answers.get(k).mark));
 			
-			// System.out.println("what");
+		}
+
+		for (int k= 0; k < down.size(); k++) {
+			if (arg0.getSource() == down.get(k)) {
+ 				if(isup[k]){
+					q.answers.get(k).mark-=2;
+				}
+				else if(!isdown[k]){
+					q.answers.get(k).mark--;
+				}
+				isdown[k] = true;
+				isup[k] = false;
+				
+			}
+			c.sendMessage(new Message(Message.ANSWER, q));
+			mark.get(k).setText(Integer.toString(q.answers.get(k).mark));
+			
 		}
 
 	}

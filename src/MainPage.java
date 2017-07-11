@@ -16,11 +16,11 @@ import javax.swing.JTextField;
 public class MainPage extends JPanel implements ActionListener {
 	Dimension d;
 	JFrame j;
-	JButton search, submit ,seequestions, setting, java, C, SQL, Verilog, VHDL;
+	JButton search, submit ,allquestions, setting, java, C, SQL, Verilog, VHDL;
 	JTextField question, tags, result;
 	JTextArea squestion;
-	JComboBox jb;
-	JComboBox ji;
+	JComboBox interests;
+	JComboBox keyword;
 	private int b;
 	private int m = 80;
 	private int i;
@@ -49,9 +49,9 @@ public class MainPage extends JPanel implements ActionListener {
 		search.setSize(100, 30);
 		search.setLocation(570, 30);
 		
-		seequestions = new JButton("seequestions");
-		seequestions.setSize(150, 50);
-		seequestions.setLocation(570, 120);
+		allquestions = new JButton("seequestions");
+		allquestions.setSize(150, 50);
+		allquestions.setLocation(550, 120);
 
 		submit = new JButton("submit");
 		submit.setSize(100, 30);
@@ -93,11 +93,6 @@ public class MainPage extends JPanel implements ActionListener {
 		VHDL.setSize(100, 30);
 		VHDL.setLocation(680, 240);
 
-//		this.si = new String[] { "A", "B" };
-//		ji = new JComboBox((ComboBoxModel) interest);
-//		ji.setSize(200, 20);
-//		ji.setLocation(230, 80);
-
 		this.add(submit);
 		this.add(search);
 		this.add(question);
@@ -106,6 +101,8 @@ public class MainPage extends JPanel implements ActionListener {
 		this.add(result);
 		this.add(setting);
         sl = new String[interest.size()];
+        si = new String[c.keywords.length];
+        si = c.keywords;
 		if (u.interest != null) {
               for(int i=0 ; i < interest.size() ; i++){
             	  if(interest.get(i).equals("java")){
@@ -155,20 +152,24 @@ public class MainPage extends JPanel implements ActionListener {
 					}
 				}
 			}
-		jb = new JComboBox(sl);
-		jb.setSize(200, 20);
-		jb.setLocation(10, 80);
+		interests = new JComboBox(sl);
+		interests.setSize(200, 20);
+		interests.setLocation(10, 80);
 		
-		this.add(jb);
-//		this.add(ji);
-		this.add(seequestions);
+		keyword = new JComboBox(si);
+		keyword.setSize(200, 20);
+		keyword.setLocation(230, 80);
+		
+		this.add(interests);
+		this.add(keyword);
+		this.add(allquestions);
 		search.addActionListener(this);
-		seequestions.addActionListener(this);
+		allquestions.addActionListener(this);
 		submit.addActionListener(this);
-		jb.addActionListener(this);
-		jb.setActionCommand("jb");
-//		ji.addActionListener(this);
-//		ji.setActionCommand("ji");
+		interests.addActionListener(this);
+		interests.setActionCommand("jb");
+		keyword.addActionListener(this);
+		keyword.setActionCommand("ji");
 		j.getContentPane().add(this);
 		setVisible(true);
 		j.setVisible(true);
@@ -188,6 +189,21 @@ public class MainPage extends JPanel implements ActionListener {
 			c.sendMessage(new Message(Message.SEARCH, question.getText()));
 			//System.out.println("msg sent");
 		}
+		
+		if (arg0.getSource() == allquestions) {
+            c.sendMessage(new Message(Message.SEARCH,"allquestions"));
+			//System.out.println("msg sent");
+		}
+		
+		if (arg0.getActionCommand().equals("interests")) {
+		    String selectItem = (String) interests.getSelectedItem();
+		    c.sendMessage(new Message(Message.SEARCH, selectItem));
+		  }
+		  if (arg0.getActionCommand().equals("keyword")) {
+		    String selectItem = (String) keyword.getSelectedItem();
+		    c.sendMessage(new Message(Message.SEARCH, selectItem));
+		    System.out.println("hhhh");
+		  }
 
 	}
 
