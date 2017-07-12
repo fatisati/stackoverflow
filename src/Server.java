@@ -277,7 +277,7 @@ public class Server {
 			while (itr.hasNext()) {
 
 				Document d = itr.next();
-				System.out.println(d.toJson());
+				//System.out.println(d.toJson());
 				questions.add(new Question(d));
 			}
 
