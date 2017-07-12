@@ -25,22 +25,46 @@ public class AnswerPage extends JPanel implements ActionListener {
 	ArrayList<JLabel> mark = new ArrayList<JLabel>();
 	ArrayList<JButton> up = new ArrayList<JButton>();
 	ArrayList<JButton> down = new ArrayList<JButton>();
+	ArrayList<JButton> anscom = new ArrayList<JButton>();
+	ArrayList<JTextArea> showAnsCom = new ArrayList<JTextArea>();
+
 	JScrollPane scroll;
 	JTextArea scomment;
+
+	JTextArea showComments;
+	JScrollPane showCommentsScroll;
 
 	JButton comment;
 	JButton submit;
 	boolean isup[], isdown[];
 
 	public AnswerPage(Client client, Userz user, Question q) {
+
+		showComments = new JTextArea();
+		showComments.setSize(800, 50);
+		showComments.setLocation(10, 70 + (170 * (q.answers.size())));
+		showComments.setEditable(false);
+
+		showCommentsScroll = new JScrollPane(showComments);
+		showCommentsScroll.setSize(800, 50);
+		showCommentsScroll.setLocation(10, 70 + (170 * (q.answers.size())));
+		this.add(showCommentsScroll);
+
+		System.out.println("comsize" + q.comments.size());
+		for (Comment com : q.comments) {
+			showComments.append(com.username + ": " + com.content + " " + com.date + "\n");
+		}
 		// TODO Auto-generated constructor stub
 		isup = new boolean[q.answers.size()];
 		isdown = new boolean[q.answers.size()];
-		System.out.println(isup[0]);
+		// System.out.println(isup[0]);
 		u = user;
 		c = client;
 		d = Toolkit.getDefaultToolkit().getScreenSize();
 		j = new JFrame();
+		scroll = new JScrollPane(this);
+		scroll.setSize(1150, 700);
+		scroll.setLocation(90, 0);
 		setSize(1150, 700);
 		j.setSize(1150, 700);
 		setLocation(0, 0);
@@ -55,7 +79,7 @@ public class AnswerPage extends JPanel implements ActionListener {
 
 		comment = new JButton("comment");
 		comment.setSize(100, 30);
-		comment.setLocation(550, 20);
+		comment.setLocation(820, 170 + (170 * (q.answers.size())));
 
 		this.q = q;
 		if (q == null) {
@@ -86,6 +110,19 @@ public class AnswerPage extends JPanel implements ActionListener {
 			down.get(i).setLocation(820, 90 + (70 * i));
 			down.get(i).addActionListener(this);
 			this.add(down.get(i));
+
+			anscom.add(new JButton("comment"));
+			anscom.get(i).setSize(100, 30);
+			anscom.get(i).setLocation(930, 70 + (70 * i));
+			anscom.get(i).addActionListener(this);
+			this.add(anscom.get(i));
+
+			// JTextArea ja = new JTextArea();
+			// ja.setSize(800, 25);
+			// showComments.setLocation(10, 150 + (70 * i));;
+			// showComments.setEditable(false);
+			// this.add(ja);
+			// showAnsCom.add(ja);
 			// comment.add(new JTextArea());
 			// comments.get(i).setSize(800, 100);
 			// comments.get(i).setLocation(10, 110+(160*i));
@@ -99,11 +136,11 @@ public class AnswerPage extends JPanel implements ActionListener {
 
 		scomment = new JTextArea();
 		scomment.setSize(800, 100);
-		scomment.setLocation(10, 70 + (170 * (q.answers.size())));
+		scomment.setLocation(10, 130 + (170 * (q.answers.size())));
 
 		submit = new JButton("submit");
 		submit.setSize(100, 30);
-		submit.setLocation(820, 100 + (170 * (q.answers.size())));
+		submit.setLocation(820, 130 + (170 * (q.answers.size())));
 
 		scroll = new JScrollPane();
 
@@ -116,8 +153,15 @@ public class AnswerPage extends JPanel implements ActionListener {
 		comment.addActionListener(this);
 		submit.addActionListener(this);
 		scroll.add(this);
+		JPanel panel = new JPanel();
+		panel.setSize(1150, 700);
+		panel.setLocation(0, 0);
+		panel.setLayout(null);
+		panel.setVisible(true);
+		panel.add(scroll);
 
 		j.add(this);
+		scroll.setVisible(true);
 		setVisible(true);
 		// scroll.setVisible(true);
 
@@ -180,6 +224,32 @@ public class AnswerPage extends JPanel implements ActionListener {
 			c.sendMessage(new Message(Message.ANSWER, q));
 			mark.get(k).setText(Integer.toString(q.answers.get(k).mark));
 
+		}
+
+		for (int k = 0; k < anscom.size(); k++) {
+			
+			if (arg0.getSource() == anscom.get(k)) {
+				System.out.println("k:"+k);
+				if(scomment.getText()!=null){
+					q.answers.get(k).comments.add(new Comment(scomment.getText(), u.username, new Date()));
+					c.sendMessage(new Message(Message.ANSWER, q));
+					System.out.println("message sent");
+					System.out.println("size"+q.answers.get(k).comments.size());
+				}
+				for (Comment com : q.answers.get(k).comments) {
+					System.out.println(com.username + ": " + com.content + " " + com.date );
+
+				}
+			}
+		}
+
+		if (arg0.getSource() == comment)
+
+		{
+			Comment com = new Comment(scomment.getText(), u.username, new Date());
+			showComments.append(com.username + ": " + com.content + " " + com.date + "\n");
+			q.comments.add(com);
+			c.sendMessage(new Message(Message.QCOMMENT, q));
 		}
 
 	}

@@ -128,7 +128,7 @@ public class Server {
 			// Userz u = (Userz) message;
 			MongoCollection<Document> collection = database.getCollection("Users");
 			u = (Userz) message;
-			Document doc = new Document("username", u.username).append("password", u.pass);
+			Document doc = new Document("username", u.username).append("password", u.password);
 
 			// System.out.println(doc.toJson()+"heh");
 			Document doc1 = collection.find(eq("username", u.username)).first();
@@ -137,7 +137,7 @@ public class Server {
 				// saveImg("C:\\Users\\Fateme\\workspace\\StackOverflow\\ghool1.png",
 				// "ghool");
 				// showImg("ghool");
-				Document doc2 = collection.find(and(eq("username", u.username), eq("password", u.pass))).first();
+				Document doc2 = collection.find(and(eq("username", u.username), eq("password", u.password))).first();
 				if (doc2 != null) {
 					// String intrest = collection.find(and(eq("username",
 					// u.username), eq("password", u.pass)))
@@ -180,17 +180,17 @@ public class Server {
 			// }
 			String arr[] = new String[3];
 			Document doc = new Document("name", u.name).append("username", u.username).append("email", u.email)
-					.append("password", u.pass).append("interest", u.interest);
+					.append("password", u.password).append("interest", u.interest);
 			// collection.deleteMany("name",123);
 
-			MongoCursor<Document> cursor = collection.find().iterator();
-			try {
-				while (cursor.hasNext()) {
-					System.out.println(cursor.next().toJson());
-				}
-			} finally {
-				cursor.close();
-			}
+			//MongoCursor<Document> cursor = collection.find().iterator();
+//			try {
+//				while (cursor.hasNext()) {
+//					System.out.println(cursor.next().toJson());
+//				}
+//			} finally {
+//				cursor.close();
+//			}
 
 			Document doc1 = collection.find(eq("username", u.username)).first();
 			if (doc1 == null) {
@@ -277,6 +277,7 @@ public class Server {
 			while (itr.hasNext()) {
 
 				Document d = itr.next();
+				System.out.println(d.toJson());
 				questions.add(new Question(d));
 			}
 
@@ -295,7 +296,7 @@ public class Server {
 			// System.out.println("answers");
 			Question q = (Question) message;
 			MongoCollection<Document> collection = database.getCollection("Question");
-			MongoCollection<Document> answersCollection = database.getCollection("Answers");
+			//MongoCollection<Document> answersCollection = database.getCollection("Answers");
 
 			if (q == null) {
 				System.out.println("null q");
@@ -303,11 +304,25 @@ public class Server {
 
 			ArrayList<Document> ansdoc = new ArrayList<>();
 			for (Answer ans : q.answers) {
+				if(ans.comments.size()>0){
+					System.out.println("server:");
+				}
 				ansdoc.add(ans.toDocument());
 			}
-
-			collection.updateOne(and(eq("content", q.content), eq("keywords", q.keywords)),
+			//System.out.println(q.content);
+			collection.updateOne(eq("content", q.content),
 					new Document("$set", new Document("answers", ansdoc)));
+			
+			Iterator<Document>itr=collection.find(eq("content", q.content)).iterator();
+//			for(Answer a: q.answers){
+//				if(a.comments.size()>0){
+//					System.out.println("big");
+//				}
+//			}
+			while(itr.hasNext()){
+				System.out.println("server"+itr.next().toJson());
+			}
+		
 
 			try {
 				sOutput.writeObject("your answer added successfully");
@@ -360,42 +375,40 @@ public class Server {
 			MongoCollection<Document> collection = database.getCollection("Question");
 			Iterator<Document> itr = collection.find().iterator();
 			ArrayList<Question> questions = new ArrayList<>();
-			// while (itr.hasNext()) {
-			//
-			// Document d = itr.next();
-			// Question q = new Question(d.getString("content"),
-			// (ArrayList<String>) d.get("keywords"));
-			//
-			// ArrayList<Document> docs = (ArrayList<Document>)
-			// d.get("answers");
-			// ArrayList<Answer> answers = new ArrayList<>();
-			//
-			// // if (docs != null) {
-			// // for (Document doc : docs) {
-			// // Answer ans = new Answer(doc.getString("content"),
-			// // doc.getString("username"));
-			// // ans.mark = doc.getInteger("mark", 0);
-			// // ans.comments = (ArrayList<String>) doc.get("comments");
-			// // answers.add(ans);
-			// // }
-			// // }
-			// // q.answers = answers;
-			// if (q.answers == null) {
-			// q.answers = new ArrayList<>();
-			// }
-			//
-			// // q.answers = (ArrayList<String>) d.get("answers");
-			// // if(q.answers == null){
-			// // q.answers = new ArrayList<>();
-			// // }
-			// questions.add(q);
-			// }
+			while(itr.hasNext()){
+				questions.add(new Question(itr.next()));
+			}
 
 			try {
 				// System.out.println("zahrasadara inahash dige" +
 				// questions.size());
 				sOutput.writeObject(questions);
 				// System.out.println(questions.get(0).content+" hemm");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if(type == Message.QCOMMENT){
+			Question q = (Question) message;
+			MongoCollection<Document> collection = database.getCollection("Question");
+			//MongoCollection<Document> answersCollection = database.getCollection("Answers");
+
+			if (q == null) {
+				System.out.println("null q");
+			}
+
+			ArrayList<Document> comdoc = new ArrayList<>();
+			for (Comment com : q.comments) {
+				comdoc.add(com.toDocument());
+			}
+			
+			collection.updateOne(and(eq("content", q.content)),
+					new Document("$set", new Document("comments", comdoc)));
+
+			try {
+				sOutput.writeObject("your comment added successfully");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -536,17 +549,7 @@ public class Server {
 					if (answer(1, message, sOutput) == 2) {
 						// System.out.println("wrong found");
 						writeMsg("WrongUserOrPassword");
-					} // else
-						// writeMsg(intrestList);
-						// answer(1, message, sOutput);
-						// writeMsg("List of the users connected at " +
-						// sdf.format(new Date()) + "\n");
-						// // scan al the users connected
-						// for (int i = 0; i < al.size(); ++i) {
-						// ClientThread ct = al.get(i);
-						// writeMsg((i + 1) + ") " + ct.username + " since " +
-						// ct.date);
-						// }
+					} 
 					break;
 
 				case Message.ADD:
@@ -559,12 +562,15 @@ public class Server {
 					break;
 
 				case Message.ANSWER:
-					message = cm.messageObject;
+					//message = cm.messageObject;
 					Question q = (Question) message;
-					// if(q==null){
-					// System.out.println("aah");
-					// }
-					answer(Message.ANSWER, message, sOutput);
+					System.out.println("co");
+					for (Answer ans:q.answers){
+						if(ans.comments.size()>0){
+							System.out.println("ah hre");
+						}
+					}
+					answer(Message.ANSWER, q, sOutput);
 					break;
 
 				case Message.DELETE:
@@ -580,6 +586,11 @@ public class Server {
 				case Message.VIEWALL:
 					message = cm.getMessage();
 					answer(Message.VIEWALL, message, sOutput);
+					break;
+					
+				case Message.QCOMMENT:
+					message = cm.messageObject;
+					answer(Message.QCOMMENT, message, sOutput);
 					break;
 
 				}

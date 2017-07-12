@@ -11,7 +11,7 @@ import java.io.*;
 public class Message implements Serializable {
 
     static final int SEARCH = 0, LOGIN = 1, LOGOUT = 2, REGISTER = 3, ADD = 4, GETKEYWORDS = 5,
-    		ANSWER = 6, DELETE=7, KEYWORDS=8, VIEWALL = 9 ;
+    		ANSWER = 6, DELETE=7, KEYWORDS=8, VIEWALL = 9, USERUPDATE = 10, QCOMMENT = 11;
     private int type;
     private String message;
     Object messageObject ;

@@ -161,8 +161,9 @@ public class Frame extends JFrame implements ActionListener {
 		}
 		if (arg0.getSource() == signup) {
 			// sp = new Signup(c);
-			Userz u = new Userz("", username.getText(), "", password.getText(), null);
-			c.sendMessage(new Message(Message.REGISTER, u));
+			//Userz u = new Userz("", username.getText(), "", password.getText(), null);
+			new Signup(c);
+			//c.sendMessage(new Message(Message.REGISTER, u));
 			// qp = new QuestionPage(c, u);
 		}
 
